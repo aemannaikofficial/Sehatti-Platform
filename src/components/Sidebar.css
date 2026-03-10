@@ -1,0 +1,210 @@
+.sidebar {
+  position: fixed;
+  top: var(--header-h);
+  left: 0;
+  width: var(--sidebar-w);
+  height: calc(100vh - var(--header-h) - var(--bottom-bar-h));
+  background: var(--ink);
+  border-right: 1px solid rgba(232, 185, 106, 0.1);
+  display: flex;
+  flex-direction: column;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 50;
+}
+
+/* ─── Path info ─── */
+.sidebar-path {
+  padding: 32px 24px 24px;
+}
+.sidebar-path-label {
+  font-size: 10px;
+  font-weight: 700;
+  letter-spacing: 2px;
+  color: var(--gold);
+  margin-bottom: 8px;
+  text-transform: uppercase;
+}
+.sidebar-path-title {
+  font-family: 'Playfair Display', serif;
+  font-size: 18px;
+  font-weight: 600;
+  color: var(--white);
+  line-height: 1.3;
+}
+
+/* ─── Progress ─── */
+.sidebar-progress-wrap {
+  padding: 0 24px 24px;
+  border-bottom: 1px solid rgba(232, 185, 106, 0.08);
+}
+.sidebar-progress-labels {
+  display: flex;
+  justify-content: space-between;
+  font-size: 11px;
+  color: var(--mist);
+  margin-bottom: 8px;
+  font-weight: 600;
+}
+.sidebar-progress-track {
+  height: 2px;
+  background: rgba(232, 185, 106, 0.05);
+  border-radius: 1px;
+  overflow: hidden;
+}
+.sidebar-progress-fill {
+  height: 100%;
+  background: var(--gold);
+  transition: width 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  box-shadow: 0 0 10px rgba(201, 150, 58, 0.3);
+}
+
+/* ─── Stepper ─── */
+.sidebar-stepper {
+  flex: 1;
+  padding: 24px 0;
+  display: flex;
+  flex-direction: column;
+}
+
+.stepper-item {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 16px;
+  padding: 12px 24px;
+  cursor: default;
+  transition: var(--transition);
+}
+.stepper-item.completed {
+  cursor: pointer;
+}
+.stepper-item.active {
+  background: rgba(201, 150, 58, 0.04);
+}
+.stepper-item.completed:hover {
+  background: rgba(232, 185, 106, 0.03);
+}
+
+/* Vertical connector line */
+.stepper-connector {
+  position: absolute;
+  left: 35px;
+  top: 0;
+  bottom: 0;
+  width: 1px;
+  background: rgba(232, 185, 106, 0.1);
+  z-index: 1;
+}
+.stepper-item:first-child .stepper-connector {
+  top: 50%;
+}
+.stepper-item:last-child .stepper-connector {
+  bottom: 50%;
+}
+
+.stepper-item.completed .stepper-connector,
+.stepper-item.active .stepper-connector {
+  background: rgba(201, 150, 58, 0.4);
+}
+
+/* Circle */
+.stepper-circle {
+  width: 24px; height: 24px;
+  border-radius: 50%;
+  border: 1px solid;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+  font-size: 10px;
+  font-weight: 700;
+  transition: var(--transition);
+  position: relative;
+  z-index: 2;
+  background: var(--ink);
+}
+.stepper-item.upcoming .stepper-circle {
+  border-color: rgba(232, 185, 106, 0.2);
+  color: var(--mist);
+  opacity: 0.5;
+}
+.stepper-item.active .stepper-circle {
+  border-color: var(--gold);
+  color: var(--ink);
+  background: var(--gold);
+  box-shadow: 0 0 12px rgba(201, 150, 58, 0.4);
+}
+.stepper-item.completed .stepper-circle {
+  border-color: var(--gold);
+  color: var(--gold);
+  background: rgba(201, 150, 58, 0.1);
+}
+
+/* Label */
+.stepper-label {
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+  transition: var(--transition);
+}
+.stepper-item.upcoming .stepper-label { color: var(--mist); opacity: 0.5; }
+.stepper-item.active .stepper-label   { color: var(--white); font-weight: 600; }
+.stepper-item.completed .stepper-label { color: var(--fog); }
+
+/* ─── Footer ─── */
+.sidebar-footer {
+  padding: 24px;
+  border-top: 1px solid rgba(232, 185, 106, 0.08);
+}
+.sidebar-footer p {
+  font-size: 11px;
+  color: var(--mist);
+  line-height: 1.6;
+  opacity: 0.6;
+}
+
+/* ─── High-Fidelity Emerald Theme (HR Path) ─── */
+.assessment-path-hr .sidebar {
+  background: #030d0c;
+  border-color: rgba(43, 182, 158, 0.1);
+}
+
+.assessment-path-hr .sidebar-path-label {
+  color: #2bb69e;
+}
+
+.assessment-path-hr .sidebar-progress-fill {
+  background: #2bb69e;
+  box-shadow: 0 0 10px rgba(43, 182, 158, 0.3);
+}
+
+.assessment-path-hr .stepper-item.active .stepper-circle {
+  background: #2bb69e;
+  color: #030d0c;
+  border-color: #2bb69e;
+  box-shadow: 0 0 12px rgba(43, 182, 158, 0.4);
+}
+
+.assessment-path-hr .stepper-item.completed .stepper-circle {
+  border-color: #2bb69e;
+  color: #2bb69e;
+  background: rgba(43, 182, 158, 0.1);
+}
+
+.assessment-path-hr .stepper-item.active {
+  background: rgba(43, 182, 158, 0.05);
+}
+
+.assessment-path-hr .stepper-connector {
+  background: rgba(43, 182, 158, 0.1);
+}
+
+.assessment-path-hr .stepper-item.completed .stepper-connector,
+.assessment-path-hr .stepper-item.active .stepper-connector {
+  background: rgba(43, 182, 158, 0.4);
+}
+
+.assessment-path-hr .sidebar-progress-track {
+  background: rgba(43, 182, 158, 0.08);
+}
