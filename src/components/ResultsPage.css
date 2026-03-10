@@ -774,6 +774,23 @@
     gap: 24px;
   }
 
+  .hr-score-ring {
+    transform: scale(0.85);
+  }
+
+  .hr-results-actions {
+    flex-direction: column;
+    width: 100%;
+    gap: 12px;
+  }
+
+  .btn-hr-primary, .btn-hr-secondary {
+    width: 100%;
+    justify-content: center;
+    text-align: center;
+    padding: 14px;
+  }
+
   .emp-dimension-grid {
     grid-template-columns: 1fr;
   }
@@ -781,6 +798,7 @@
   .hr-report-title {
     font-size: 32px;
     text-align: center;
+    line-height: 1.2;
   }
 
   .results-cta-row {
@@ -795,5 +813,31 @@
 
   .rec-text {
     font-size: 14px;
+  }
+
+  .gap-info {
+    flex-direction: column;
+    gap: 4px;
+    align-items: flex-start;
+  }
+
+  .gap-legend {
+    flex-wrap: wrap;
+    gap: 12px;
+    justify-content: center;
+  }
+}
+
+@media (max-width: 480px) {
+  .emp-score-card, .hr-score-card {
+    padding: 24px 16px;
+  }
+
+  .score-category-label-gold, .hr-score-text h2 {
+    font-size: 22px;
+  }
+
+  .hr-report-title {
+    font-size: 28px;
   }
 }
