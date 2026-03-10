@@ -1,5 +1,7 @@
-import React, { useMemo } from 'react';
+import React, { useMemo, useRef } from 'react';
 import './ResultsPage.css';
+import jsPDF from 'jspdf';
+import html2canvas from 'html2canvas';
 
 const getCategory = (percent) => {
   if (percent >= 80) return { label: 'Thriving', color: '#4ade80', icon: '✦' };
@@ -16,6 +18,8 @@ const getHRCategory = (percent) => {
 };
 
 const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview, onSelectDMInterview }) => {
+  const reportRef = useRef(null);
+
   const { percent, category } = useMemo(() => {
     let _score = 0, _maxScore = 0;
     questions.forEach(q => {
@@ -32,6 +36,39 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
     const category = path === 'employee' ? getCategory(percent) : getHRCategory(percent);
     return { percent, category };
   }, [answers, questions, path]);
+
+  const downloadPDF = async () => {
+    if (!reportRef.current) return;
+
+    try {
+      const element = reportRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        backgroundColor: '#0a0f1e', // Match theme background
+        logging: false,
+      });
+
+      const imgData = canvas.toDataURL('image/png');
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`sehatti-${path}-report.pdf`);
+    } catch (error) {
+      console.error('Error generating PDF:', error);
+      alert('Failed to generate PDF. Please try again.');
+    }
+  };
+
+  const handleShare = () => {
+    navigator.clipboard.writeText(window.location.href)
+      .then(() => alert('Link copied to clipboard!'))
+      .catch(err => console.error('Failed to copy: ', err));
+  };
 
   return (
     <div className={`results-page ${path === 'hr' ? 'hr-report' : 'employee-report'}`}>
@@ -61,7 +98,7 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
       </header>
 
       {path === 'hr' ? (
-        <div className="hr-results-container">
+        <div className="hr-results-container" ref={reportRef}>
           <header className="hr-results-top">
             <div className="hr-results-breadcrumb">SCREEN 5 OF 5 — HR ORG REPORT · AUTOMATED SUMMARY</div>
             <div className="hr-report-meta">ORGANIZATIONAL WELLBEING REPORT · FEBRUARY 2026</div>
@@ -134,8 +171,8 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
               </section>
 
               <div className="hr-results-actions">
-                <button className="btn-hr-primary">Book Strategy Consultation</button>
-                <button className="btn-hr-secondary">Download Full Report (PDF)</button>
+                <button className="btn-hr-primary" onClick={handleShare}>Share Results</button>
+                <button className="btn-hr-secondary" onClick={downloadPDF}>Download Full Report (PDF)</button>
                 <button className="btn-hr-secondary" style={{ borderColor: 'var(--theme-accent)', color: 'var(--theme-accent)' }} onClick={onSelectDMInterview}>Open Evaluator Console</button>
               </div>
             </main>
@@ -178,7 +215,7 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
           </div>
         </div>
       ) : (
-        <div className="emp-results-container">
+        <div className="emp-results-container" ref={reportRef}>
           <header className="emp-results-top">
             <div className="emp-results-breadcrumb">SCREEN 4 OF 5 — EMPLOYEE RESULTS · AUTOMATED REPORT</div>
             <div className="emp-report-meta">YOUR PERSONAL REPORT · FEBRUARY 2026</div>
@@ -246,8 +283,8 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
               </section>
 
               <div className="emp-results-actions">
-                <button className="btn-emp-primary" onClick={onRestart}>Download My Report (PDF)</button>
-                <button className="btn-emp-secondary" onClick={onRestart}>Book 1:1 Coaching Session</button>
+                <button className="btn-emp-primary" onClick={handleShare}>Share Results</button>
+                <button className="btn-emp-primary" onClick={downloadPDF}>Download My Report (PDF)</button>
                 <button className="btn-emp-secondary" style={{ borderColor: 'var(--theme-accent)', color: 'var(--theme-accent)' }} onClick={onSelectEmpInterview}>Open Evaluator Console</button>
               </div>
             </main>
