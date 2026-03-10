@@ -747,22 +747,53 @@
   letter-spacing: 0.8px;
 }
 
-@media (max-width: 600px) {
-  .results-stats {
-    gap: 20px;
-    padding: 24px 20px;
-    flex-wrap: wrap;
-  }
-
-  .results-stat-divider {
-    display: none;
-  }
-
-  .results-recommendations {
-    padding: 24px 20px;
-  }
-
+@media (max-width: 768px) {
   .results-header {
     padding: 0 20px;
+    height: 60px;
+  }
+
+  .logo-text {
+    font-size: 14px;
+    letter-spacing: 2px;
+  }
+
+  .emp-results-container, .hr-results-container {
+    padding: 40px 20px 60px;
+  }
+
+  .emp-results-layout, .hr-results-layout {
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+
+  .emp-score-card, .hr-score-card {
+    flex-direction: column;
+    padding: 32px 24px;
+    text-align: center;
+    gap: 24px;
+  }
+
+  .emp-dimension-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .hr-report-title {
+    font-size: 32px;
+    text-align: center;
+  }
+
+  .results-cta-row {
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .btn-cta-primary {
+    width: 100%;
+    padding: 14px;
+  }
+
+  .rec-text {
+    font-size: 14px;
   }
 }

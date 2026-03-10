@@ -330,3 +330,45 @@
   color: var(--text-dim);
   line-height: 1.6;
 }
+
+@media (max-width: 768px) {
+  .survey-wrapper {
+    padding: 24px 16px;
+  }
+
+  .survey-title {
+    font-size: 26px;
+  }
+
+  .form-label {
+    font-size: 20px;
+  }
+
+  .scale-container {
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 8px;
+  }
+
+  .scale-item {
+    flex: none;
+    width: calc(33.33% - 8px);
+    height: 48px;
+    font-size: 14px;
+  }
+
+  .options-grid.grid-cols {
+    grid-template-columns: 1fr;
+  }
+
+  .option-radio {
+    padding: 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .scale-item {
+    width: calc(50% - 8px);
+  }
+}
+
