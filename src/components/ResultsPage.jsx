@@ -1,7 +1,6 @@
-import React, { useMemo, useRef } from 'react';
+import React, { useMemo } from 'react';
 import './ResultsPage.css';
 import jsPDF from 'jspdf';
-import html2canvas from 'html2canvas';
 
 const getCategory = (percent) => {
   if (percent >= 80) return { label: 'Thriving', color: '#4ade80', icon: '✦' };
@@ -18,8 +17,6 @@ const getHRCategory = (percent) => {
 };
 
 const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview, onSelectDMInterview }) => {
-  const reportRef = useRef(null);
-
   const { percent, category } = useMemo(() => {
     let _score = 0, _maxScore = 0;
     questions.forEach(q => {
@@ -37,27 +34,136 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
     return { percent, category };
   }, [answers, questions, path]);
 
-  const downloadPDF = async () => {
-    if (!reportRef.current) return;
-
+  const downloadPDF = () => {
     try {
-      const element = reportRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#0a0f1e', // Match theme background
-        logging: false,
+      const doc = new jsPDF();
+      const pageWidth = doc.internal.pageSize.getWidth();
+      const margin = 20;
+      let y = 20;
+
+      // Header Branding
+      doc.setFillColor(10, 15, 30); // Dark background for header
+      doc.rect(0, 0, pageWidth, 40, 'F');
+      
+      doc.setTextColor(200, 151, 58); // Gold
+      doc.setFontSize(24);
+      doc.setFont('helvetica', 'bold');
+      doc.text('SEHATTI', margin, 25);
+      
+      doc.setTextColor(255, 255, 255);
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      doc.text('WORKPLACE WELLBEING DIAGNOSTIC', margin, 32);
+      
+      y = 55;
+
+      // Report Header
+      doc.setTextColor(14, 27, 42); // Navy
+      doc.setFontSize(18);
+      doc.setFont('helvetica', 'bold');
+      const title = path === 'hr' ? 'Organizational Wellbeing Report' : 'Personal Wellbeing Assessment';
+      doc.text(title, margin, y);
+      
+      y += 10;
+      doc.setFontSize(10);
+      doc.setFont('helvetica', 'normal');
+      const date = new Date().toLocaleDateString('en-AE', { year: 'numeric', month: 'long', day: 'numeric' });
+      doc.text(`Generated on: ${date}`, margin, y);
+
+      y += 20;
+
+      // Score Section
+      doc.setDrawColor(200, 151, 58); // Gold border
+      doc.setLineWidth(0.5);
+      doc.line(margin, y, pageWidth - margin, y);
+      
+      y += 15;
+      doc.setFontSize(12);
+      doc.text('OVERALL SCORE', margin, y);
+      
+      y += 15;
+      doc.setFontSize(48);
+      doc.setTextColor(path === 'hr' ? 43 : 200, path === 'hr' ? 182 : 151, path === 'hr' ? 158 : 58); // Teal for HR, Gold for Employee
+      doc.text(`${percent}`, margin, y);
+      
+      doc.setFontSize(14);
+      doc.setTextColor(100, 100, 100);
+      doc.text('/ 100', margin + 30, y - 2);
+
+      // Category / Summary
+      y += 15;
+      doc.setFontSize(16);
+      doc.setTextColor(path === 'hr' ? 43 : 200, path === 'hr' ? 182 : 151, path === 'hr' ? 158 : 58);
+      doc.setFont('helvetica', 'bold');
+      doc.text(category.label, margin, y);
+
+      y += 10;
+      doc.setFontSize(11);
+      doc.setTextColor(80, 80, 80);
+      doc.setFont('helvetica', 'normal');
+      const summaryText = path === 'hr' 
+        ? "Your organization has foundational wellbeing elements in place but significant strategic gaps remain in mental health programming and data-driven decision-making."
+        : "Your score indicates your current workplace wellbeing level. Focus areas like work-life boundaries and emotional resilience are key to long-term performance.";
+      
+      const splitSummary = doc.splitTextToSize(summaryText, pageWidth - (margin * 2));
+      doc.text(splitSummary, margin, y);
+      y += (splitSummary.length * 6) + 10;
+
+      // Breakdown Section
+      doc.setFontSize(14);
+      doc.setTextColor(14, 27, 42);
+      doc.setFont('helvetica', 'bold');
+      doc.text(path === 'hr' ? 'WELLBEING GAP ANALYSIS' : 'DIMENSION BREAKDOWN', margin, y);
+      
+      y += 10;
+      doc.setLineWidth(0.1);
+      doc.setDrawColor(200, 200, 200);
+
+      const items = path === 'hr' ? [
+        { label: 'Mental Health Programs', val: 35 },
+        { label: 'Burnout Prevention Policy', val: 50 },
+        { label: 'Wellbeing Budget Allocation', val: 40 },
+        { label: 'Data & Measurement', val: 25 },
+        { label: 'Leadership Training', val: 65 },
+      ] : [
+        { label: 'Emotional Resilience', val: 55 },
+        { label: 'Productivity & Focus', val: 72 },
+        { label: 'Social Connection', val: 80 },
+        { label: 'Work-Life Balance', val: 48 },
+        { label: 'Sense of Purpose', val: 75 },
+      ];
+
+      items.forEach(item => {
+        if (y > 270) { // Simple page break
+          doc.addPage();
+          y = 20;
+        }
+        doc.setFontSize(10);
+        doc.setTextColor(50, 50, 50);
+        doc.setFont('helvetica', 'normal');
+        doc.text(item.label, margin, y);
+        
+        doc.setTextColor(path === 'hr' ? 43 : 200, path === 'hr' ? 182 : 151, path === 'hr' ? 158 : 58);
+        doc.text(`${item.val}%`, pageWidth - margin - 10, y);
+        
+        y += 4;
+        // Bar track
+        doc.setFillColor(240, 240, 240);
+        doc.rect(margin, y, pageWidth - (margin * 2), 2, 'F');
+        // Bar fill
+        doc.setFillColor(path === 'hr' ? 43 : 200, path === 'hr' ? 182 : 151, path === 'hr' ? 158 : 58);
+        doc.rect(margin, y, ((pageWidth - (margin * 2)) * item.val) / 100, 2, 'F');
+        
+        y += 12;
       });
 
-      const imgData = canvas.toDataURL('image/png');
-      const pdf = new jsPDF('p', 'mm', 'a4');
-      
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+      // Footer
+      doc.setFontSize(8);
+      doc.setTextColor(150, 150, 150);
+      doc.text('© 2026 Sehatti. All rights reserved. Confidential diagnostic report.', margin, 285);
+      doc.text(`Page 1 of 1`, pageWidth - margin - 15, 285);
 
-      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
-      pdf.save(`sehatti-${path}-report.pdf`);
+      doc.save(`Sehatti_${path === 'hr' ? 'HR' : 'Employee'}_Report.pdf`);
     } catch (error) {
       console.error('Error generating PDF:', error);
       alert('Failed to generate PDF. Please try again.');
@@ -98,7 +204,7 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
       </header>
 
       {path === 'hr' ? (
-        <div className="hr-results-container" ref={reportRef}>
+        <div className="hr-results-container">
           <header className="hr-results-top">
             <div className="hr-results-breadcrumb">SCREEN 5 OF 5 — HR ORG REPORT · AUTOMATED SUMMARY</div>
             <div className="hr-report-meta">ORGANIZATIONAL WELLBEING REPORT · FEBRUARY 2026</div>
@@ -215,7 +321,7 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
           </div>
         </div>
       ) : (
-        <div className="emp-results-container" ref={reportRef}>
+        <div className="emp-results-container">
           <header className="emp-results-top">
             <div className="emp-results-breadcrumb">SCREEN 4 OF 5 — EMPLOYEE RESULTS · AUTOMATED REPORT</div>
             <div className="emp-report-meta">YOUR PERSONAL REPORT · FEBRUARY 2026</div>
