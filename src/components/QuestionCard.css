@@ -150,3 +150,29 @@
   display: block;
   opacity: 0.8;
 }
+
+@media (max-width: 768px) {
+  .question-text {
+    font-size: 28px;
+    margin-bottom: 12px;
+  }
+
+  .question-subtitle {
+    font-size: 13px;
+    margin-bottom: 32px;
+  }
+
+  .option-item {
+    padding: 16px 20px;
+    gap: 12px;
+  }
+
+  .option-label {
+    font-size: 14px;
+  }
+
+  .option-bubble {
+    width: 20px;
+    height: 20px;
+  }
+}

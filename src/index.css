@@ -47,10 +47,20 @@ body {
   color: var(--text-primary);
   line-height: 1.6;
   -webkit-font-smoothing: antialiased;
+  overflow-x: hidden; /* Prevent horizontal scroll globally */
 }
 
 #root {
   height: 100%;
+  width: 100%;
+}
+
+/* Mobile Responsive Utilities */
+@media (max-width: 768px) {
+  :root {
+    --sidebar-w: 0px;
+    --header-h: 60px;
+  }
 }
 
 /* Scrollbar */

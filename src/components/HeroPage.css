@@ -370,17 +370,71 @@
 }
 
 @media (max-width: 768px) {
+  .navbar {
+    padding: 14px 20px;
+  }
+
+  .navLinks {
+    display: none;
+  }
+
+  .logoText {
+    font-size: 16px;
+    letter-spacing: 0.1em;
+  }
+
+  .hero {
+    padding: 40px 20px 0;
+  }
+
   .heroTitle {
-    font-size: 42px;
+    font-size: 36px;
+    margin-bottom: 20px;
+  }
+
+  .heroSubtitle {
+    font-size: 14px;
+    margin-bottom: 32px;
+    line-height: 1.6;
   }
 
   .pathCards {
     grid-template-columns: 1fr;
-    padding: 0 24px;
+    padding: 0 16px;
+    gap: 16px;
+  }
+
+  .pathCard {
+    padding: 24px 20px;
+  }
+
+  .pathTitle {
+    font-size: 24px;
   }
 
   .statsBar {
-    flex-wrap: wrap;
-    gap: 32px;
+    padding: 32px 20px;
+    gap: 24px;
+    justify-content: space-around;
+  }
+
+  .statNumber {
+    font-size: 24px;
+  }
+
+  .statLabel {
+    font-size: 10px;
+  }
+}
+
+@media (max-width: 480px) {
+  .heroTitle {
+    font-size: 32px;
+  }
+
+  .statsBar {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 20px;
   }
 }

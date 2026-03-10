@@ -208,3 +208,9 @@
 .assessment-path-hr .sidebar-progress-track {
   background: rgba(43, 182, 158, 0.08);
 }
+
+@media (max-width: 768px) {
+  .sidebar {
+    display: none;
+  }
+}
