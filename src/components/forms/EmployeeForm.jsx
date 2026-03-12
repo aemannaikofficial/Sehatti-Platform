@@ -41,12 +41,12 @@ const EmployeeForm = ({ onComplete, onRestart }) => {
     const answers = {
       1: formData.q1,
       2: formData.q2,
-      3: ['Female', 'Male'].indexOf(formData.q3),
+      3: ['Female', 'Male', 'Other'].indexOf(formData.q3),
       4: ['Individual contributor', 'Team lead/supervisor', 'Manager', 'Executive'].indexOf(formData.q4),
       5: ['Less than 1 year', '1-3 years', '3-5 years', '5+ years'].indexOf(formData.q5),
       6: ['Under 35', '35-45', '45-55', '55+'].indexOf(formData.q6),
       7: formData.q7 !== null ? formData.q7 - 1 : 0,
-      8: formData.q8 !== null ? Math.round(formData.q8 / 2) - 1 : 0,
+      8: formData.q8 !== null ? formData.q8 - 1 : 0,
       9: formData.q9 !== null ? formData.q9 - 1 : 0,
       10: formData.q10,
       11: formData.q11 === 'Yes' ? 0 : 1,
@@ -93,7 +93,7 @@ const EmployeeForm = ({ onComplete, onRestart }) => {
           <label className="form-label">Gender</label>
           <p className="form-help">This helps us benchmark your results.</p>
           <div className="options-grid">
-            {['Female', 'Male'].map(opt => (
+            {['Female', 'Male', 'Other'].map(opt => (
               <label key={opt} className={`option-radio ${formData.q3 === opt ? 'selected' : ''}`}>
                 <input type="radio" name="q3" value={opt} onChange={handleChange} checked={formData.q3 === opt} />
                 <span className="radio-check" />
@@ -180,9 +180,9 @@ const EmployeeForm = ({ onComplete, onRestart }) => {
       render: () => (
         <div className="form-group">
           <label className="form-label">How severe are your stress symptoms (fatigue, anxiety, etc.)?</label>
-          <p className="form-help">Rate the intensity on a scale from Manageable (1) to Overwhelming (10).</p>
-          <div className="scale-container" style={{ gridTemplateColumns: 'repeat(10, 1fr)' }}>
-            {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map(num => (
+          <p className="form-help">Rate the intensity on a scale from Manageable (1) to Overwhelming (5).</p>
+          <div className="scale-container">
+            {[1, 2, 3, 4, 5].map(num => (
               <label key={num} className={`scale-item ${formData.q8 === num ? 'selected' : ''}`}>
                 <input type="radio" name="q8" value={num} onChange={() => handleRatingChange('q8', num)} checked={formData.q8 === num} />
                 {num}
@@ -423,7 +423,7 @@ const EmployeeForm = ({ onComplete, onRestart }) => {
 
         <main className="assessment-main">
           <div className="survey-badge">PHASE 2 VALIDATION</div>
-          
+
           <div className="question-meta" style={{ marginBottom: '24px', fontSize: '11px', color: 'var(--theme-accent)', letterSpacing: '2px', fontWeight: '700' }}>
             QUESTION {currentStep + 1} OF {steps.length} &nbsp;·&nbsp; {current.section.toUpperCase()}
           </div>
@@ -445,14 +445,14 @@ const EmployeeForm = ({ onComplete, onRestart }) => {
           </nav>
         </main>
       </div>
-      
+
       <footer className="assessment-bottom-bar">
         <div className="bottom-bar-screen">
           SCREEN {current.sectionIndex + 2} OF {sections.length + 2} — EMPLOYEE ASSESSMENT
         </div>
         <div className="bottom-bar-dots">
           {steps.map((_, idx) => {
-            const val = formData[`q${idx+1}`];
+            const val = formData[`q${idx + 1}`];
             let ans = false;
             if (Array.isArray(val)) ans = val.length > 0;
             else if (typeof val === 'string') ans = val.trim() !== '';
