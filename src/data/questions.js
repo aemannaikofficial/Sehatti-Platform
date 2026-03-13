@@ -28,6 +28,7 @@ export const employeeQuestions = [
     options: [
       { label: 'Female', score: null },
       { label: 'Male', score: null },
+      { label: 'Prefer not to say', score: null },
     ],
   },
   {
@@ -270,6 +271,7 @@ export const hrQuestions = [
     options: [
       { label: 'Female', score: null },
       { label: 'Male', score: null },
+      { label: 'Prefer not to say', score: null },
     ],
   },
   {
