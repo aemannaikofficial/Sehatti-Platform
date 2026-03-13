@@ -1,8 +1,8 @@
 import React, { useMemo } from 'react';
 import './ResultsPage.css';
 import jsPDF from 'jspdf';
-import { evaluateLead, getLeadScore } from '../utils/decisionMakerLogic';
-import { evaluateEmployee, getEmployeeAdoptionScore } from '../utils/employeeLogic';
+import { getLeadScore } from '../utils/decisionMakerLogic';
+import { getEmployeeAdoptionScore } from '../utils/employeeLogic';
 
 const getCategory = (percent) => {
   if (percent >= 80) return { label: 'Thriving', color: '#4ade80', icon: '✦' };
@@ -19,7 +19,7 @@ const getHRCategory = (percent) => {
 };
 
 const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview, onSelectDMInterview }) => {
-  const { percent, category, leadInsights, leadScoreDetails, empInsights, empScoreDetails } = useMemo(() => {
+  const { percent, category, leadScoreDetails, empScoreDetails } = useMemo(() => {
     let _score = 0, _maxScore = 0;
     questions.forEach(q => {
       const ans = answers[q.id];
@@ -35,14 +35,12 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
     const category = path === 'employee' ? getCategory(percent) : getHRCategory(percent);
     
     // Evaluate lead data if it's the Decision Maker path
-    const leadInsights = path === 'hr' ? evaluateLead(answers) : [];
     const leadScoreDetails = path === 'hr' ? getLeadScore(answers) : null;
 
     // Evaluate employee adoption data
-    const empInsights = path === 'employee' ? evaluateEmployee(answers) : [];
     const empScoreDetails = path === 'employee' ? getEmployeeAdoptionScore(answers) : null;
 
-    return { percent, category, leadInsights, leadScoreDetails, empInsights, empScoreDetails };
+    return { percent, category, leadScoreDetails, empScoreDetails };
   }, [answers, questions, path]);
 
   const downloadPDF = () => {
@@ -294,7 +292,7 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
               </div>
             </main>
 
-            <aside className="hr-results-sidebar" style={{ minWidth: '380px' }}>
+            <aside className="hr-results-sidebar">
               <section className="hr-widget summary-widget">
                 <h3 className="widget-title">QUALIFICATION SUMMARY</h3>
                 <div className="summary-stat">
@@ -317,33 +315,6 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
                 </div>
               </section>
 
-              <section className="hr-widget pilot-offer-card" style={{ padding: 0 }}>
-                <h3 className="pilot-card-title" style={{ padding: '24px 24px 12px', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: 0 }}>
-                  Business Action Framework
-                </h3>
-                <div style={{ maxHeight: '400px', overflowY: 'auto', padding: '0 24px 24px' }}>
-                  {leadInsights.map((log) => (
-                    <div key={log.id} style={{ padding: '16px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                      <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: '4px' }}>
-                        {log.insight}
-                      </div>
-                      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)', marginBottom: '8px', fontWeight: '500' }}>
-                        {log.q}
-                      </div>
-                      <div style={{ 
-                        fontSize: '12px', 
-                        padding: '6px 10px', 
-                        borderRadius: '4px', 
-                        background: log.status === 'success' ? 'rgba(43, 182, 158, 0.1)' : log.status === 'error' ? 'rgba(248, 113, 113, 0.1)' : log.status === 'warning' ? 'rgba(200, 151, 58, 0.1)' : 'rgba(255,255,255,0.05)',
-                        color: log.status === 'success' ? '#2bb69e' : log.status === 'error' ? '#f87171' : log.status === 'warning' ? '#c8973a' : '#aaa',
-                        lineHeight: '1.4'
-                      }}>
-                        {log.action}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
             </aside>
           </div>
         </div>
@@ -422,7 +393,7 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
               </div>
             </main>
 
-            <aside className="hr-results-sidebar" style={{ minWidth: '380px' }}>
+            <aside className="hr-results-sidebar">
               <section className="hr-widget summary-widget">
                 <h3 className="widget-title-gold">USER VALIDATION SUMMARY</h3>
                 <div className="summary-stat">
@@ -445,33 +416,6 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
                 </div>
               </section>
 
-              <section className="emp-widget ai-guide-card" style={{ padding: 0 }}>
-                <h3 className="ai-guide-title font-playfair" style={{ padding: '24px 24px 12px', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: 0, fontSize: '18px' }}>
-                  Business Action Framework
-                </h3>
-                <div style={{ maxHeight: '400px', overflowY: 'auto', padding: '0 24px 24px' }}>
-                  {empInsights.map((log) => (
-                    <div key={log.id} style={{ padding: '16px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
-                      <div style={{ fontSize: '11px', color: 'var(--theme-accent)', textTransform: 'uppercase', marginBottom: '4px' }}>
-                        {log.insight}
-                      </div>
-                      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)', marginBottom: '8px', fontWeight: '500' }}>
-                        {log.q}
-                      </div>
-                      <div style={{ 
-                        fontSize: '12px', 
-                        padding: '6px 10px', 
-                        borderRadius: '4px', 
-                        background: log.status === 'success' ? 'rgba(43, 182, 158, 0.1)' : log.status === 'error' ? 'rgba(248, 113, 113, 0.1)' : log.status === 'warning' ? 'rgba(200, 151, 58, 0.1)' : 'rgba(255,255,255,0.05)',
-                        color: log.status === 'success' ? '#2bb69e' : log.status === 'error' ? '#f87171' : log.status === 'warning' ? '#c8973a' : '#aaa',
-                        lineHeight: '1.4'
-                      }}>
-                        {log.action}
-                      </div>
-                    </div>
-                  ))}
-                </div>
-              </section>
             </aside>
           </div>
         </div>

@@ -74,6 +74,17 @@ export const evaluateEmployee = (answers) => {
     status: isFreqHigh ? 'error' : 'neutral'
   });
 
+  // Correlation: Hours + Stress
+  if (isHighHours && isFreqHigh) {
+    insightLog.push({
+      id: 'q6-q7-correlate',
+      q: 'Q6 & Q7: Hours + Stress',
+      insight: 'Critical Burnout Risk Matrix Verified',
+      action: 'Overworked AND Highly Stressed segment. High conversion probability.',
+      status: 'error'
+    });
+  }
+
   // Q8: Stress Severity
   const sevVal = answers[8] !== undefined ? answers[8] + 1 : 0; 
   const isSevHigh = sevVal >= 4; // user said Mean >= 3.5, for individual >= 4
@@ -168,14 +179,25 @@ export const getEmployeeAdoptionScore = (answers) => {
   
   let points = 0;
   
+  const isHighFreq = answers[7] !== undefined && (answers[7] + 1) >= 4;
+  const isHighHours = answers[6] !== undefined && answers[6] >= 2; // '45-55' and '55+'
+  
   // Pain 
-  if (answers[7] !== undefined && (answers[7] + 1) >= 4) points += 20; // High freq
+  if (isHighFreq) points += 20; // High freq
   if (answers[8] !== undefined && (answers[8] + 1) >= 4) points += 20; // High severity
   if (answers[11] === 0) points += 20; // Needed support
   
   // Solution Fit
   if (answers[12] !== undefined && (answers[12] + 1) >= 4) points += 25; // High likelihood
   if (answers[13] >= 3) points += 15; // High usage freq
+  
+  // Correlation Matrix: Overworked AND Stressed
+  if (isHighHours && isHighFreq) {
+    points += 20; // Massive adoption potential bump
+  }
+  
+  // Enforce max score cap at 100
+  points = Math.min(points, 100);
   
   if (points >= 80) return { score: points, tag: 'Early Adopter / Beta', style: 'text-green', isBeta: true };
   if (points >= 50) return { score: points, tag: 'Moderate Fit', style: 'text-gold', isBeta: false };

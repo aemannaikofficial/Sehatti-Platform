@@ -142,8 +142,8 @@ const DecisionMakerInterview = ({ onRestart }) => {
       </header>
 
       <main style={{ maxWidth: '900px', margin: '0 auto', padding: '40px 20px', width: '100%' }}>
-        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '32px' }}>
-          <div>
+        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '24px', marginBottom: '32px' }}>
+          <div style={{ flex: '1 1 300px' }}>
             <div className="survey-badge" style={{ marginBottom: '16px', backgroundColor: 'rgba(43, 182, 158, 0.2)', color: 'var(--theme-accent)', border: '1px solid var(--theme-accent)' }}>INTERNAL TEAM USE ONLY</div>
             <h1 style={{ fontSize: '32px', fontFamily: "'Playfair Display', serif", marginBottom: '8px' }}>Decision Maker Interview Validation</h1>
             <p style={{ color: 'rgba(255,255,255,0.7)' }}>Live scoring and action mapping. Target: Average score ≥ 4.</p>
@@ -160,16 +160,16 @@ const DecisionMakerInterview = ({ onRestart }) => {
           </div>
         </div>
 
-        <div style={{ display: 'flex', gap: '20px', marginBottom: '40px' }}>
-          <div style={{ flex: 1 }}>
+        <div style={{ display: 'flex', gap: '20px', marginBottom: '40px', flexWrap: 'wrap' }}>
+          <div style={{ flex: '1 1 150px' }}>
             <label className="form-label">Interview ID</label>
             <input type="text" name="id" value={formData.id} onChange={handleChange} className="form-input" placeholder="e.g. HR001" />
           </div>
-          <div style={{ flex: 2 }}>
+          <div style={{ flex: '2 1 200px' }}>
             <label className="form-label">Candidate Name</label>
             <input type="text" name="name" value={formData.name} onChange={handleChange} className="form-input" placeholder="John Doe" />
           </div>
-          <div style={{ flex: 1 }}>
+          <div style={{ flex: '1 1 200px' }}>
             <label className="form-label">Survey Wellbeing Issue Severity</label>
             <select name="surveySeverity" value={formData.surveySeverity} onChange={handleChange} className="form-input" style={{ color: formData.surveySeverity ? '#ffffff' : 'rgba(255,255,255,0.5)', backgroundColor: 'rgba(0,0,0,0.2)' }}>
               <option value="" disabled style={{ color: '#000' }}>Select (1-5)</option>
