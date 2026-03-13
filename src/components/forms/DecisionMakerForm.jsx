@@ -45,7 +45,7 @@ const DecisionMakerForm = ({ onComplete, onRestart }) => {
     const answers = {
       1: formData.q1,
       2: formData.q2,
-      3: ['Female', 'Male', 'Other'].indexOf(formData.q3),
+      3: ['Female', 'Male', 'Prefer not to say'].indexOf(formData.q3),
       4: jobTitleOptions.indexOf(formData.q4),
       5: ['Less than 50', '50-200', '200-500', '500-2,000', 'More than 2,000'].indexOf(formData.q5),
       6: industryOptions.indexOf(formData.q6),
@@ -91,7 +91,7 @@ const DecisionMakerForm = ({ onComplete, onRestart }) => {
         <div className="form-group">
           <label className="form-label">Gender</label>
           <div className="options-grid">
-            {['Female', 'Male', 'Other'].map(opt => (
+            {['Female', 'Male', 'Prefer not to say'].map(opt => (
               <label key={opt} className={`option-radio ${formData.q3 === opt ? 'selected' : ''}`}>
                 <input type="radio" name="q3" value={opt} onChange={handleChange} checked={formData.q3 === opt} />
                 <span className="radio-check" />

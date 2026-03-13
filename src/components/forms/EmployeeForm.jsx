@@ -93,7 +93,7 @@ const EmployeeForm = ({ onComplete, onRestart }) => {
           <label className="form-label">Gender</label>
           <p className="form-help">This helps us benchmark your results.</p>
           <div className="options-grid">
-            {['Female', 'Male', 'Other'].map(opt => (
+            {['Female', 'Male', 'Prefer not to say'].map(opt => (
               <label key={opt} className={`option-radio ${formData.q3 === opt ? 'selected' : ''}`}>
                 <input type="radio" name="q3" value={opt} onChange={handleChange} checked={formData.q3 === opt} />
                 <span className="radio-check" />
