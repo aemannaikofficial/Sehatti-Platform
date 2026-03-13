@@ -1,6 +1,8 @@
 import React, { useMemo } from 'react';
 import './ResultsPage.css';
 import jsPDF from 'jspdf';
+import { evaluateLead, getLeadScore } from '../utils/decisionMakerLogic';
+import { evaluateEmployee, getEmployeeAdoptionScore } from '../utils/employeeLogic';
 
 const getCategory = (percent) => {
   if (percent >= 80) return { label: 'Thriving', color: '#4ade80', icon: '✦' };
@@ -17,7 +19,7 @@ const getHRCategory = (percent) => {
 };
 
 const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview, onSelectDMInterview }) => {
-  const { percent, category } = useMemo(() => {
+  const { percent, category, leadInsights, leadScoreDetails, empInsights, empScoreDetails } = useMemo(() => {
     let _score = 0, _maxScore = 0;
     questions.forEach(q => {
       const ans = answers[q.id];
@@ -29,9 +31,18 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
         _maxScore += q.options.filter(o => o.score === 1).length;
       }
     });
-    const percent = _maxScore > 0 ? Math.round((_score / _maxScore) * 100) : 0;
+      const percent = _maxScore > 0 ? Math.round((_score / _maxScore) * 100) : 0;
     const category = path === 'employee' ? getCategory(percent) : getHRCategory(percent);
-    return { percent, category };
+    
+    // Evaluate lead data if it's the Decision Maker path
+    const leadInsights = path === 'hr' ? evaluateLead(answers) : [];
+    const leadScoreDetails = path === 'hr' ? getLeadScore(answers) : null;
+
+    // Evaluate employee adoption data
+    const empInsights = path === 'employee' ? evaluateEmployee(answers) : [];
+    const empScoreDetails = path === 'employee' ? getEmployeeAdoptionScore(answers) : null;
+
+    return { percent, category, leadInsights, leadScoreDetails, empInsights, empScoreDetails };
   }, [answers, questions, path]);
 
   const downloadPDF = () => {
@@ -283,39 +294,55 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
               </div>
             </main>
 
-            <aside className="hr-results-sidebar">
+            <aside className="hr-results-sidebar" style={{ minWidth: '380px' }}>
               <section className="hr-widget summary-widget">
-                <h3 className="widget-title">ORGANIZATIONAL SUMMARY</h3>
+                <h3 className="widget-title">QUALIFICATION SUMMARY</h3>
                 <div className="summary-stat">
-                  <span className="stat-label">READINESS SCORE</span>
+                  <span className="stat-label">ASSESSMENT SCORE</span>
                   <span className="stat-value">{percent} / 100</span>
                 </div>
                 <div className="summary-stat">
-                  <span className="stat-label">GCC SECTOR PERCENTILE</span>
-                  <span className="stat-value">45th percentile</span>
-                </div>
-                <div className="summary-stat">
-                  <span className="stat-label">CRITICAL GAP</span>
-                  <span className="stat-value text-red">Data & Measurement (25%)</span>
-                </div>
-                <div className="summary-stat">
-                  <span className="stat-label">STRONGEST AREA</span>
-                  <span className="stat-value text-green">Leadership Training (65%)</span>
+                  <span className="stat-label">LEAD SCORE (OUT OF 100)</span>
+                  <span className={`stat-value ${leadScoreDetails.style}`}>{leadScoreDetails.score}</span>
                 </div>
                 <div className="summary-stat">
                   <span className="stat-label">PILOT ELIGIBILITY</span>
-                  <span className="stat-value text-green">Eligible — Recommended</span>
+                  <span className={`stat-value ${leadScoreDetails.isPilot ? 'text-green' : 'text-gray'}`}>
+                    {leadScoreDetails.isPilot ? 'Eligible — Requested' : 'Not Requested'}
+                  </span>
                 </div>
                 <div className="summary-stat">
-                  <span className="stat-label">CRM STATUS</span>
-                  <span className="stat-value text-gold">Warm Lead · Tagged</span>
+                  <span className="stat-label">CRM ACTION</span>
+                  <span className={`stat-value ${leadScoreDetails.style}`}>{leadScoreDetails.tag}</span>
                 </div>
               </section>
 
-              <section className="hr-widget pilot-offer-card">
-                <h3 className="pilot-card-title">Free Pilot Offer</h3>
-                <p>Your organization qualifies for a 30-day SEHATTI pilot program. A dedicated wellbeing strategist will reach out within 48 hours.</p>
-                <button className="btn-pilot-cta">Confirm Pilot Interest &rarr;</button>
+              <section className="hr-widget pilot-offer-card" style={{ padding: 0 }}>
+                <h3 className="pilot-card-title" style={{ padding: '24px 24px 12px', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: 0 }}>
+                  Business Action Framework
+                </h3>
+                <div style={{ maxHeight: '400px', overflowY: 'auto', padding: '0 24px 24px' }}>
+                  {leadInsights.map((log) => (
+                    <div key={log.id} style={{ padding: '16px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ fontSize: '11px', color: 'rgba(255,255,255,0.4)', textTransform: 'uppercase', marginBottom: '4px' }}>
+                        {log.insight}
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)', marginBottom: '8px', fontWeight: '500' }}>
+                        {log.q}
+                      </div>
+                      <div style={{ 
+                        fontSize: '12px', 
+                        padding: '6px 10px', 
+                        borderRadius: '4px', 
+                        background: log.status === 'success' ? 'rgba(43, 182, 158, 0.1)' : log.status === 'error' ? 'rgba(248, 113, 113, 0.1)' : log.status === 'warning' ? 'rgba(200, 151, 58, 0.1)' : 'rgba(255,255,255,0.05)',
+                        color: log.status === 'success' ? '#2bb69e' : log.status === 'error' ? '#f87171' : log.status === 'warning' ? '#c8973a' : '#aaa',
+                        lineHeight: '1.4'
+                      }}>
+                        {log.action}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </section>
             </aside>
           </div>
@@ -395,39 +422,55 @@ const ResultsPage = ({ path, answers, questions, onRestart, onSelectEmpInterview
               </div>
             </main>
 
-            <aside className="hr-results-sidebar">
+            <aside className="hr-results-sidebar" style={{ minWidth: '380px' }}>
               <section className="hr-widget summary-widget">
-                <h3 className="widget-title-gold">QUICK INSIGHTS</h3>
+                <h3 className="widget-title-gold">USER VALIDATION SUMMARY</h3>
                 <div className="summary-stat">
-                  <span className="stat-label">OVERALL SCORE</span>
+                  <span className="stat-label">WELLBEING SCORE</span>
                   <span className="stat-value">{percent} / 100</span>
                 </div>
                 <div className="summary-stat">
-                  <span className="stat-label">BURNOUT RISK LEVEL</span>
-                  <span className="stat-value text-gold">Moderate Risk</span>
+                  <span className="stat-label">ADOPTION POTENTIAL (OUT OF 100)</span>
+                  <span className={`stat-value ${empScoreDetails.style}`}>{empScoreDetails.score}</span>
                 </div>
                 <div className="summary-stat">
-                  <span className="stat-label">STRONGEST AREA</span>
-                  <span className="stat-value text-green">Social Connection (80)</span>
+                  <span className="stat-label">PILOT / BETA FIT</span>
+                  <span className={`stat-value ${empScoreDetails.isBeta ? 'text-green' : 'text-gray'}`}>
+                    {empScoreDetails.isBeta ? 'Strong Fit — Invite' : 'Not Ideal Target'}
+                  </span>
                 </div>
                 <div className="summary-stat">
-                  <span className="stat-label">FOCUS AREA</span>
-                  <span className="stat-value text-red">Work-Life Balance (48)</span>
-                </div>
-                <div className="summary-stat">
-                  <span className="stat-label">GCC PERCENTILE</span>
-                  <span className="stat-value">Above 58% of respondents</span>
-                </div>
-                <div className="summary-stat">
-                  <span className="stat-label">RECOMMENDED ACTION</span>
-                  <span className="stat-value">Boundary-setting coaching session</span>
+                  <span className="stat-label">USER SEGMENT</span>
+                  <span className={`stat-value ${empScoreDetails.style}`}>{empScoreDetails.tag}</span>
                 </div>
               </section>
 
-              <section className="emp-widget ai-guide-card">
-                <h3 className="ai-guide-title font-playfair">Your Free AI Guide</h3>
-                <p>Based on your results, we've prepared a personalized 7-day micro-wellbeing plan to help you build resilience and improve work-life balance.</p>
-                <button className="btn-ai-cta" onClick={onRestart}>Access Your Guide &rarr;</button>
+              <section className="emp-widget ai-guide-card" style={{ padding: 0 }}>
+                <h3 className="ai-guide-title font-playfair" style={{ padding: '24px 24px 12px', borderBottom: '1px solid rgba(255,255,255,0.05)', marginBottom: 0, fontSize: '18px' }}>
+                  Business Action Framework
+                </h3>
+                <div style={{ maxHeight: '400px', overflowY: 'auto', padding: '0 24px 24px' }}>
+                  {empInsights.map((log) => (
+                    <div key={log.id} style={{ padding: '16px 0', borderBottom: '1px solid rgba(255,255,255,0.05)' }}>
+                      <div style={{ fontSize: '11px', color: 'var(--theme-accent)', textTransform: 'uppercase', marginBottom: '4px' }}>
+                        {log.insight}
+                      </div>
+                      <div style={{ fontSize: '13px', color: 'rgba(255,255,255,0.9)', marginBottom: '8px', fontWeight: '500' }}>
+                        {log.q}
+                      </div>
+                      <div style={{ 
+                        fontSize: '12px', 
+                        padding: '6px 10px', 
+                        borderRadius: '4px', 
+                        background: log.status === 'success' ? 'rgba(43, 182, 158, 0.1)' : log.status === 'error' ? 'rgba(248, 113, 113, 0.1)' : log.status === 'warning' ? 'rgba(200, 151, 58, 0.1)' : 'rgba(255,255,255,0.05)',
+                        color: log.status === 'success' ? '#2bb69e' : log.status === 'error' ? '#f87171' : log.status === 'warning' ? '#c8973a' : '#aaa',
+                        lineHeight: '1.4'
+                      }}>
+                        {log.action}
+                      </div>
+                    </div>
+                  ))}
+                </div>
               </section>
             </aside>
           </div>
